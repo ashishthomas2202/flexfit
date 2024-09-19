@@ -40,8 +40,10 @@ const UserProfileForm = ({ profile, session }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+        const { name, value } = e.target;
         setFormData({
             ...formData,
+            [name]: value,
             [name]: value,
         });
     };
@@ -55,7 +57,66 @@ const UserProfileForm = ({ profile, session }) => {
         }
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const imageURL = URL.createObjectURL(file);
+            setImagePreview(imageURL); // Preview the image before upload
+            setProfilePictureFile(file); // Store the file for upload later
+        }
+    };
+
     const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!session || !session.user || !session.user.uid) {
+            alert('You must be logged in to update your profile.');
+            return;
+        }
+
+        let profilePictureURL = formData.profilePicture;
+
+        if (profilePictureFile) {
+            try {
+                const storageRef = ref(storage, `profilePictures/${session.user.uid}/${profilePictureFile.name}`);
+                const snapshot = await uploadBytes(storageRef, profilePictureFile);
+                profilePictureURL = await getDownloadURL(snapshot.ref);
+            } catch (error) {
+                console.error('Error uploading profile picture:', error);
+                return;
+            }
+        }
+
+        const updatedProfileData = {
+            ...formData,
+            profilePicture: profilePictureURL,
+            uid: session.user.uid // Ensure UID is included
+        };
+
+        try {
+            const response = await fetch('/api/profile/update-user-profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user: { uid: session.user.uid }, // Send the user's UID for profile lookup
+                    profileData: updatedProfileData,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Profile updated successfully');
+            } else {
+                console.error('Error updating profile:', data.error);
+                alert('Failed to update profile');
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            alert('Failed to update profile');
+        }
         e.preventDefault();
 
         if (!session || !session.user || !session.user.uid) {
@@ -166,6 +227,9 @@ const UserProfileForm = ({ profile, session }) => {
                     {...register('gender')}
                     style={styles.input}
                 >
+                    <option value="">Select Gender</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
                     <option value="">Select Gender</option>
                     <option value="M">Male</option>
                     <option value="F">Female</option>

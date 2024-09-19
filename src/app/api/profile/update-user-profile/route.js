@@ -1,10 +1,16 @@
-import { db, storage } from "@/lib/firebaseConfig";
-import { doc, setDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { Timestamp } from "firebase/firestore";
+// import { db } from "@/lib/firebaseConfig";
+import db from "@/lib/firebase";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
+import { NextResponse } from "next/server";
 
 // Update user profile based on uid and provided data
-export async function Get(request) {
+export async function POST(request) {
   try {
     const formData = await request.formData();
     const uid = formData.get('uid');  // Get uid from FormData instead of email
@@ -47,6 +53,9 @@ export async function Get(request) {
     return NextResponse.json({ message: 'Profile updated successfully' }, { status: 200 });
   } catch (error) {
     console.error("Error updating profile:", error);
-    return NextResponse.json({ error: "Failed to update user profile" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update profile" },
+      { status: 500 }
+    );
   }
 }
