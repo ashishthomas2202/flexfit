@@ -2,12 +2,36 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import UserProfileForm from "@/components/ui/UserProfileForm";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+//validation
+const profileSchema = yup.object().shape({
+  name: yup.string().required('Name is required'),
+  email: yup.string().email('Invalid email').required('Email is required'),
+  phone: yup
+    .string()
+    .matches(/^\d+$/, 'Phone number must be digits only')
+    .min(10, 'Phone number must be at least 10 digits')
+    .required('Phone number is required'),
+});
 
 const Profile = () => {
   const { data: session, status } = useSession();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  //validation
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(profileSchema),
+    mode: "onBlur",
+  });
 
   useEffect(() => {
     console.log("user", session?.user)
@@ -52,7 +76,7 @@ const Profile = () => {
   if (error) return <p>Error: {error}</p>;
 
   return profile ? (
-    <UserProfileForm profile={profile} session={session} />
+    <UserProfileForm profile={profile} session={session}/>
   ) : (
     <p>No profile data available</p>
   );
