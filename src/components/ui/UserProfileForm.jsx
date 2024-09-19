@@ -45,7 +45,7 @@ const UserProfileForm = ({ profile, onSubmit, session }) => {
             {/* Input fields */}
             <label>
                 First Name:
-                <input
+                <Input
                     type="text"
                     name="firstName"
                     value={formData.firstName}
@@ -55,7 +55,7 @@ const UserProfileForm = ({ profile, onSubmit, session }) => {
 
             <label>
                 Last Name:
-                <input
+                <Input
                     type="text"
                     name="lastName"
                     value={formData.lastName}
@@ -65,7 +65,7 @@ const UserProfileForm = ({ profile, onSubmit, session }) => {
 
             <label>
                 Phone Number:
-                <input
+                <Input
                     type="text"
                     name="phoneNumber"
                     value={formData.phoneNumber}
@@ -75,7 +75,7 @@ const UserProfileForm = ({ profile, onSubmit, session }) => {
 
             <label>
                 Date of Birth (MM/DD/YYYY):
-                <input
+                <Input
                     type="text"
                     name="DOB"
                     value={formData.DOB}
@@ -99,7 +99,7 @@ const UserProfileForm = ({ profile, onSubmit, session }) => {
 
             <label>
                 Height (inches):
-                <input
+                <Input
                     type="number"
                     name="height"
                     value={formData.height}
@@ -109,7 +109,7 @@ const UserProfileForm = ({ profile, onSubmit, session }) => {
 
             <label>
                 Weight (lbs):
-                <input
+                <Input
                     type="number"
                     name="weight"
                     value={formData.weight}
@@ -119,7 +119,7 @@ const UserProfileForm = ({ profile, onSubmit, session }) => {
 
             <label>
                 Profile Picture:
-                <input
+                <Input
                     type="file"
                     accept="image/*"
                     onChange={(e) => setFormData({ ...formData, picture: e.target.files[0] })}

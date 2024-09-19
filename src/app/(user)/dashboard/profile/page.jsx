@@ -30,7 +30,6 @@ const Profile = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(profileSchema),
-    mode: "onBlur",
   });
 
   useEffect(() => {

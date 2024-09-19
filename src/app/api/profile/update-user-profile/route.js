@@ -4,7 +4,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Timestamp } from "firebase/firestore";
 
 // Update user profile based on uid and provided data
-export async function POST(request) {
+export async function Get(request) {
   try {
     const formData = await request.formData();
     const uid = formData.get('uid');  // Get uid from FormData instead of email
