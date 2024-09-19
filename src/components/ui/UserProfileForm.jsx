@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/lib/firebaseConfig"; // Import Firestore and Storage
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import Input from "@/components/ui/Input";
+import { useForm } from 'react-hook-form';
 
 const profileSchema = yup.object().shape({
     firstName: yup.string().required('First Name is required'),
@@ -15,6 +19,14 @@ const profileSchema = yup.object().shape({
     height: yup.number().required('Height is required').positive('Height must be positive'),
     weight: yup.number().required('Weight is required').positive('Weight must be positive'),
 });
+
+const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
 const UserProfileForm = ({ profile, session }) => {
     const [formData, setFormData] = useState(profile || {
@@ -40,10 +52,8 @@ const UserProfileForm = ({ profile, session }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        const { name, value } = e.target;
         setFormData({
             ...formData,
-            [name]: value,
             [name]: value,
         });
     };
@@ -57,24 +67,14 @@ const UserProfileForm = ({ profile, session }) => {
         }
     };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const imageURL = URL.createObjectURL(file);
-            setImagePreview(imageURL); // Preview the image before upload
-            setProfilePictureFile(file); // Store the file for upload later
-        }
-    };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
+    const onSubmit = async (data);
         if (!session || !session.user || !session.user.uid) {
             alert('You must be logged in to update your profile.');
             return;
         }
 
-        let profilePictureURL = formData.profilePicture;
+        let profilePictureURL = Data?.profilePicture;
 
         if (profilePictureFile) {
             try {
@@ -124,24 +124,6 @@ const UserProfileForm = ({ profile, session }) => {
             return;
         }
 
-        let profilePictureURL = formData.profilePicture;
-
-        if (profilePictureFile) {
-            try {
-                const storageRef = ref(storage, `profilePictures/${session.user.uid}/${profilePictureFile.name}`);
-                const snapshot = await uploadBytes(storageRef, profilePictureFile);
-                profilePictureURL = await getDownloadURL(snapshot.ref);
-            } catch (error) {
-                console.error('Error uploading profile picture:', error);
-                return;
-            }
-        }
-
-        const updatedProfileData = {
-            ...formData,
-            profilePicture: profilePictureURL,
-            uid: session.user.uid // Ensure UID is included
-        };
 
         try {
             const response = await fetch('/api/profile/update-user-profile', {
@@ -170,7 +152,7 @@ const UserProfileForm = ({ profile, session }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
             {/* Input fields */}
             <label>
                 First Name:
